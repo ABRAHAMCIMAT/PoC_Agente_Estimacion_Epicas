@@ -44,6 +44,9 @@ class EstimationModels:
         self.scaler = StandardScaler()
         self.features_columns = None
         
+        # Model metrics (R² scores)
+        self.model_metrics = {}  # Store R² and other metrics for each target
+        
         # Embeddings
         self.embedding_model = None
         self.embeddings = None
@@ -125,6 +128,7 @@ class EstimationModels:
             )
             rf_model.fit(X_train, y_train)
             y_pred_rf = rf_model.predict(X_test)
+            r2_rf = r2_score(y_test, y_pred_rf)
             
             # Train DecisionTree
             print(f"Training DecisionTree for {target}...")
@@ -141,23 +145,39 @@ class EstimationModels:
             )
             dt_model.fit(X_train, y_train)
             y_pred_dt = dt_model.predict(X_test)
+            r2_dt = r2_score(y_test, y_pred_dt)
             
             # Ensemble predictions
             y_pred_ensemble = (y_pred_rf + y_pred_dt) / 2
             
-            # Evaluate
+            # Evaluate all models
             mae = mean_absolute_error(y_test, y_pred_ensemble)
             mse = mean_squared_error(y_test, y_pred_ensemble)
-            r2 = r2_score(y_test, y_pred_ensemble)
+            r2_ensemble = r2_score(y_test, y_pred_ensemble)
             
             print(f"Ensemble Metrics for {target}:")
             print(f"  MAE: {mae:.4f}")
             print(f"  MSE: {mse:.4f}")
-            print(f"  R²: {r2:.4f}")
+            print(f"  R²: {r2_ensemble:.4f}")
+            print(f"Individual R² Scores:")
+            print(f"  RandomForest R²: {r2_rf:.4f}")
+            print(f"  DecisionTree R²: {r2_dt:.4f}")
             
             # Store models
             self.rf_models[target] = rf_model
             self.dt_models[target] = dt_model
+            
+            # Store metrics
+            if target not in self.model_metrics:
+                self.model_metrics[target] = {}
+            
+            self.model_metrics[target] = {
+                'ensemble': float(r2_ensemble),
+                'random_forest': float(r2_rf),
+                'decision_tree': float(r2_dt),
+                'mae': float(mae),
+                'mse': float(mse)
+            }
     
     def predict(self, X: np.ndarray, target: str = 'point') -> Dict[str, float]:
         """
@@ -291,7 +311,8 @@ class EstimationModels:
             'embedding_model': self.embedding_model if EMBEDDINGS_AVAILABLE else None,
             'embeddings': self.embeddings,
             'corpus_texts': self.corpus_texts,
-            'corpus_points': self.corpus_points
+            'corpus_points': self.corpus_points,
+            'model_metrics': self.model_metrics
         }
         
         with open(filepath, 'wb') as f:
@@ -315,6 +336,7 @@ class EstimationModels:
         self.embeddings = state.get('embeddings')
         self.corpus_texts = state.get('corpus_texts')
         self.corpus_points = state.get('corpus_points')
+        self.model_metrics = state.get('model_metrics', {})
         
         print(f"Models loaded from {filepath}")
 

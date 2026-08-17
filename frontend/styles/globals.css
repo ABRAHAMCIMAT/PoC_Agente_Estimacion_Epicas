@@ -526,6 +526,48 @@ body {
   color: #667eea;
 }
 
+.confidence-row {
+  background: #fafbfc;
+}
+
+.confidence-row td {
+  padding: 8px 12px;
+  font-size: 0.85em;
+}
+
+.confidence-label {
+  font-weight: 500;
+  color: #666;
+  font-style: italic;
+}
+
+.confidence-cell {
+  text-align: center;
+}
+
+.confidence-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.85em;
+}
+
+.confidence-high {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.confidence-medium {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.confidence-low {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
 /* ===== SEMANTIC ESTIMATE ===== */
 .semantic-estimate {
   background: linear-gradient(135deg, #f0f2ff 0%, #e0e5ff 100%);

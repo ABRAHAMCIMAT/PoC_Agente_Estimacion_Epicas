@@ -53,6 +53,7 @@ class EstimationResponse(BaseModel):
     cost_estimate: Dict[str, float]
     effort_estimate: Dict[str, float]
     semantic_estimate: Optional[Dict[str, float]] = None
+    model_confidence: Optional[Dict[str, Dict[str, float]]] = None  # R² scores
 
 
 class ModelStatsResponse(BaseModel):
@@ -62,6 +63,7 @@ class ModelStatsResponse(BaseModel):
     training_samples: Optional[int]
     features_count: Optional[int]
     model_location: str
+    model_metrics: Optional[Dict[str, Dict[str, float]]] = None  # R² and other metrics
 
 
 # ============================================================================
@@ -299,6 +301,16 @@ async def estimate_single_story(request: StoryEstimationRequest):
             except:
                 pass
         
+        # Get model confidence metrics (R² scores)
+        model_confidence = None
+        if hasattr(estimation_models, 'model_metrics') and estimation_models.model_metrics:
+            model_confidence = {
+                'point': estimation_models.model_metrics.get('point', {}),
+                'time': estimation_models.model_metrics.get('time', {}),
+                'cost': estimation_models.model_metrics.get('cost', {}),
+                'effort': estimation_models.model_metrics.get('effort', {})
+            }
+        
         # Format response
         return EstimationResponse(
             story_title=request.title,
@@ -322,7 +334,8 @@ async def estimate_single_story(request: StoryEstimationRequest):
                 'random_forest': float(effort_pred['random_forest'][0]),
                 'decision_tree': float(effort_pred['decision_tree'][0])
             },
-            semantic_estimate=semantic
+            semantic_estimate=semantic,
+            model_confidence=model_confidence
         )
     
     except Exception as e:
@@ -449,7 +462,8 @@ async def get_model_stats():
         targets=list(estimation_models.rf_models.keys()) if estimation_models else [],
         training_samples=None,  # Would need to track during training
         features_count=len(estimation_models.features_columns) if estimation_models and estimation_models.features_columns else None,
-        model_location=str(MODEL_FILE)
+        model_location=str(MODEL_FILE),
+        model_metrics=estimation_models.model_metrics if estimation_models else None
     )
 
 

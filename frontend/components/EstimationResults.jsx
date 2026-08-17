@@ -29,6 +29,12 @@ export default function EstimationResults({ results }) {
     setExpandedStory(expandedStory === index ? null : index);
   };
 
+  const getConfidenceClass = (r2Value) => {
+    if (r2Value >= 0.8) return 'confidence-high';
+    if (r2Value >= 0.6) return 'confidence-medium';
+    return 'confidence-low';
+  };
+
   const getMaxValues = () => {
     if (!results?.results?.length) return {};
     return {
@@ -242,11 +248,59 @@ export default function EstimationResults({ results }) {
                         <td>{story.point_estimate.random_forest.toFixed(2)}</td>
                         <td>{story.point_estimate.decision_tree.toFixed(2)}</td>
                       </tr>
+                      <tr className="confidence-row">
+                        <td className="confidence-label">Confiabilidad (R²)</td>
+                        <td className="ensemble-cell confidence-cell">
+                          {story.model_confidence?.point?.ensemble ? (
+                            <span className={`confidence-badge ${getConfidenceClass(story.model_confidence.point.ensemble)}`}>
+                              {(story.model_confidence.point.ensemble * 100).toFixed(1)}%
+                            </span>
+                          ) : '-'}
+                        </td>
+                        <td className="confidence-cell">
+                          {story.model_confidence?.point?.random_forest ? (
+                            <span className={`confidence-badge ${getConfidenceClass(story.model_confidence.point.random_forest)}`}>
+                              {(story.model_confidence.point.random_forest * 100).toFixed(1)}%
+                            </span>
+                          ) : '-'}
+                        </td>
+                        <td className="confidence-cell">
+                          {story.model_confidence?.point?.decision_tree ? (
+                            <span className={`confidence-badge ${getConfidenceClass(story.model_confidence.point.decision_tree)}`}>
+                              {(story.model_confidence.point.decision_tree * 100).toFixed(1)}%
+                            </span>
+                          ) : '-'}
+                        </td>
+                      </tr>
                       <tr>
                         <td>Duración (Días)</td>
                         <td className="ensemble-cell"><strong>{story.time_estimate.ensemble.toFixed(2)}</strong></td>
                         <td>{story.time_estimate.random_forest.toFixed(2)}</td>
                         <td>{story.time_estimate.decision_tree.toFixed(2)}</td>
+                      </tr>
+                      <tr className="confidence-row">
+                        <td className="confidence-label">Confiabilidad (R²)</td>
+                        <td className="ensemble-cell confidence-cell">
+                          {story.model_confidence?.time?.ensemble ? (
+                            <span className={`confidence-badge ${getConfidenceClass(story.model_confidence.time.ensemble)}`}>
+                              {(story.model_confidence.time.ensemble * 100).toFixed(1)}%
+                            </span>
+                          ) : '-'}
+                        </td>
+                        <td className="confidence-cell">
+                          {story.model_confidence?.time?.random_forest ? (
+                            <span className={`confidence-badge ${getConfidenceClass(story.model_confidence.time.random_forest)}`}>
+                              {(story.model_confidence.time.random_forest * 100).toFixed(1)}%
+                            </span>
+                          ) : '-'}
+                        </td>
+                        <td className="confidence-cell">
+                          {story.model_confidence?.time?.decision_tree ? (
+                            <span className={`confidence-badge ${getConfidenceClass(story.model_confidence.time.decision_tree)}`}>
+                              {(story.model_confidence.time.decision_tree * 100).toFixed(1)}%
+                            </span>
+                          ) : '-'}
+                        </td>
                       </tr>
                       <tr>
                         <td>Costo ($)</td>
@@ -254,11 +308,59 @@ export default function EstimationResults({ results }) {
                         <td>${story.cost_estimate.random_forest.toFixed(2)}</td>
                         <td>${story.cost_estimate.decision_tree.toFixed(2)}</td>
                       </tr>
+                      <tr className="confidence-row">
+                        <td className="confidence-label">Confiabilidad (R²)</td>
+                        <td className="ensemble-cell confidence-cell">
+                          {story.model_confidence?.cost?.ensemble ? (
+                            <span className={`confidence-badge ${getConfidenceClass(story.model_confidence.cost.ensemble)}`}>
+                              {(story.model_confidence.cost.ensemble * 100).toFixed(1)}%
+                            </span>
+                          ) : '-'}
+                        </td>
+                        <td className="confidence-cell">
+                          {story.model_confidence?.cost?.random_forest ? (
+                            <span className={`confidence-badge ${getConfidenceClass(story.model_confidence.cost.random_forest)}`}>
+                              {(story.model_confidence.cost.random_forest * 100).toFixed(1)}%
+                            </span>
+                          ) : '-'}
+                        </td>
+                        <td className="confidence-cell">
+                          {story.model_confidence?.cost?.decision_tree ? (
+                            <span className={`confidence-badge ${getConfidenceClass(story.model_confidence.cost.decision_tree)}`}>
+                              {(story.model_confidence.cost.decision_tree * 100).toFixed(1)}%
+                            </span>
+                          ) : '-'}
+                        </td>
+                      </tr>
                       <tr>
                         <td>Esfuerzo</td>
                         <td className="ensemble-cell"><strong>{story.effort_estimate.ensemble.toFixed(2)}</strong></td>
                         <td>{story.effort_estimate.random_forest.toFixed(2)}</td>
                         <td>{story.effort_estimate.decision_tree.toFixed(2)}</td>
+                      </tr>
+                      <tr className="confidence-row">
+                        <td className="confidence-label">Confiabilidad (R²)</td>
+                        <td className="ensemble-cell confidence-cell">
+                          {story.model_confidence?.effort?.ensemble ? (
+                            <span className={`confidence-badge ${getConfidenceClass(story.model_confidence.effort.ensemble)}`}>
+                              {(story.model_confidence.effort.ensemble * 100).toFixed(1)}%
+                            </span>
+                          ) : '-'}
+                        </td>
+                        <td className="confidence-cell">
+                          {story.model_confidence?.effort?.random_forest ? (
+                            <span className={`confidence-badge ${getConfidenceClass(story.model_confidence.effort.random_forest)}`}>
+                              {(story.model_confidence.effort.random_forest * 100).toFixed(1)}%
+                            </span>
+                          ) : '-'}
+                        </td>
+                        <td className="confidence-cell">
+                          {story.model_confidence?.effort?.decision_tree ? (
+                            <span className={`confidence-badge ${getConfidenceClass(story.model_confidence.effort.decision_tree)}`}>
+                              {(story.model_confidence.effort.decision_tree * 100).toFixed(1)}%
+                            </span>
+                          ) : '-'}
+                        </td>
                       </tr>
                     </tbody>
                   </table>
