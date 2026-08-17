@@ -551,6 +551,7 @@ body {
   border-radius: 12px;
   font-weight: 600;
   font-size: 0.85em;
+  margin-right: 5px;
 }
 
 .confidence-high {
@@ -566,6 +567,15 @@ body {
 .confidence-low {
   background: #fee2e2;
   color: #991b1b;
+}
+
+.r2-value {
+  display: block;
+  font-size: 0.75em;
+  color: #666;
+  font-weight: normal;
+  margin-top: 3px;
+  font-family: 'Monaco', 'Courier New', monospace;
 }
 
 /* ===== SEMANTIC ESTIMATE ===== */

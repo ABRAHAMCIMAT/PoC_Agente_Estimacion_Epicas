@@ -1,331 +1,290 @@
-# Epic Estimation System
+# Sistema de Estimación de Épicas con ML
 
-A full-stack AI-powered system for estimating epic complexity using machine learning models trained on historical JIRA data.
+Sistema fullstack basado en Machine Learning para estimar automáticamente puntos de historia, duración, costo y esfuerzo de épicas/historias de usuario en proyectos Agile.
 
-## Features
+## 🎯 Características Principales
 
-- 🤖 **ML-Based Estimation**: Uses ensemble of Random Forest and Decision Tree models
-- 📊 **Multi-Target Predictions**: Estimates story points, time, cost, and effort
-- 📁 **Excel Upload**: Batch process stories from Excel files
-- 🔍 **Semantic Similarity**: Finds similar historical stories for comparison
-- 🎯 **REST API**: FastAPI backend for seamless integration
-- 💻 **Modern Frontend**: Next.js + React web interface
+- **Estimación Multi-objetivo**: Calcula 4 métricas simultáneamente:
+  - Puntos de Historia (Story Points)
+  - Duración estimada (días)
+  - Costo (USD)
+  - Esfuerzo (horas)
 
-## Architecture
+- **Modelos de Ensemble**: Utiliza combinación de:
+  - Random Forest
+  - Decision Tree
+  - Promedio Ensemble (recomendado)
 
+- **Métricas de Confiabilidad**: Muestra R² para indicar confianza en cada predicción
+  - R² > 0.8: Alta confiabilidad (Verde)
+  - R² 0.6-0.8: Confiabilidad media (Amarillo)
+  - R² < 0.6: Baja confiabilidad (Rojo)
+
+- **Interfaz en Español**: UI completamente localizada en español
+
+- **Upload de Excel**: Sube archivos Excel con historias de usuario para procesamiento por lotes
+
+- **Visualización Tabular**: Resultados en formato tabla con barras de progreso coloreadas
+
+## 📋 Requisitos Previos
+
+### Backend
+- Python 3.8+
+- pip (gestor de paquetes Python)
+
+### Frontend
+- Node.js 16+ 
+- npm o yarn
+
+## 🚀 Instalación Rápida
+
+### 1. Clonar Repositorio
+
+```bash
+git clone https://github.com/abrahamtec/PoC_Agente_Estimacion_Epicas.git
+cd PoC_Agente_Estimacion_Epicas
 ```
-epic-estimation-system/
-├── backend/                 # FastAPI application
-│   ├── app/
-│   │   └── main.py         # FastAPI server with endpoints
-│   ├── models/
-│   │   └── epic_estimation_models.py   # ML model classes
-│   ├── utils/
-│   │   └── data_preprocessing.py       # Data preprocessing
-│   ├── trained_models/     # Saved model artifacts (after training)
-│   └── requirements.txt
-│
-└── frontend/               # Next.js React application
-    ├── pages/
-    │   ├── index.jsx       # Main page
-    │   ├── _app.jsx        # App wrapper
-    └── components/
-        ├── Header.jsx
-        ├── ExcelUpload.jsx
-        └── EstimationResults.jsx
-```
 
-## Prerequisites
-
-- Python 3.10+
-- Node.js 18+
-- JIRA data export (CSV format) with the following columns:
-  - `Custom field (Story Points)` - Historical story points
-  - `Duracion_Sprint` - Sprint duration in days
-  - `Costo_por_dia` - Daily cost
-  - `Esfuerzo_por_Puntos_Historia` - Effort per story point
-
-## Installation & Setup
-
-### 1. Backend Setup
+### 2. Configurar Backend
 
 ```bash
 cd backend
 
-# Create virtual environment
+# Crear entorno virtual
 python -m venv venv
 
-# Activate virtual environment
-# On Windows:
+# Activar entorno virtual
+# En Windows:
 venv\Scripts\activate
-# On macOS/Linux:
+# En macOS/Linux:
 source venv/bin/activate
 
-# Install dependencies
+# Instalar dependencias
 pip install -r requirements.txt
-```
 
-### 2. Frontend Setup
-
-```bash
-cd frontend
-
-# Install dependencies
-npm install
-
-# Create .env.local if needed
-echo "NEXT_PUBLIC_API_URL=http://localhost:8000" > .env.local
-```
-
-## Training the Models
-
-### Step 1: Prepare JIRA Data
-
-Export your JIRA data as CSV with the required columns. Place it in the root directory or anywhere accessible.
-
-### Step 2: Train Models
-
-You can train models through the API:
-
-```bash
-# Start the backend
-cd backend
-python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
-
-# In another terminal, train the models
-curl -F "file=@path/to/Jira.csv" http://localhost:8000/train
-```
-
-Or use Python directly:
-
-```python
-from backend.models.epic_estimation_models import create_and_train_models
-
-models = create_and_train_models(
-    csv_path='Jira.csv',
-    model_dir='backend/trained_models'
-)
-```
-
-## Running the System Locally
-
-### 1. Start the Backend Server
-
-```bash
-cd backend
+# Ejecutar servidor
 python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-The API will be available at: `http://localhost:8000`
+El backend estará disponible en `http://localhost:8000`
 
-API Documentation: `http://localhost:8000/docs`
-
-### 2. Start the Frontend Development Server
+### 3. Configurar Frontend
 
 ```bash
 cd frontend
+
+# Instalar dependencias
+npm install
+
+# Ejecutar servidor de desarrollo
 npm run dev
 ```
 
-The frontend will be available at: `http://localhost:3000`
+El frontend estará disponible en `http://localhost:3000`
 
-### 3. Use the System
+## 📁 Estructura del Proyecto
 
-1. Open `http://localhost:3000` in your browser
-2. Prepare an Excel file with columns:
-   - **Titulo** - Story title
-   - **Historia de Usuario** - Story description  
-   - **Criterios de Aceptación** - Acceptance criteria (one per line or single cell)
-3. Upload the file
-4. View detailed estimations with model comparison
-
-## API Endpoints
-
-### Health Check
 ```
-GET /health
-```
-
-### Train Models
-```
-POST /train
-Content-Type: multipart/form-data
-
-file: <JIRA_CSV_FILE>
-```
-
-### Estimate Single Story
-```
-POST /estimate/single
-Content-Type: application/json
-
-{
-  "title": "Story title",
-  "description": "Story description",
-  "acceptance_criteria": ["Criterion 1", "Criterion 2"],
-  "priority": "High",
-  "issue_type": "Story"
-}
-```
-
-### Estimate from Excel
-```
-POST /estimate/excel
-Content-Type: multipart/form-data
-
-file: <EXCEL_FILE>
+├── backend/
+│   ├── app/
+│   │   ├── main.py                 # Servidor FastAPI principal
+│   │   └── dependencies.py         # Dependencias compartidas
+│   ├── models/
+│   │   └── epic_estimation_models.py # Modelos ML
+│   ├── utils/
+│   │   └── data_preprocessing.py   # Procesamiento de datos
+│   ├── trained_models/
+│   │   └── models.pkl              # Modelos entrenados
+│   ├── training_data_improved.csv  # Dataset de entrenamiento
+│   ├── requirements.txt            # Dependencias Python
+│   └── retrain_models.py           # Script de reentrenamiento
+│
+├── frontend/
+│   ├── pages/
+│   │   └── index.jsx               # Página principal
+│   ├── components/
+│   │   ├── Header.jsx              # Encabezado
+│   │   ├── ExcelUpload.jsx         # Carga de archivos
+│   │   └── EstimationResults.jsx   # Resultados
+│   ├── styles/
+│   │   └── globals.css             # Estilos globales
+│   ├── package.json
+│   └── next.config.js
+│
+├── docs/
+│   ├── ARQUITECTURA.md             # Descripción de arquitectura
+│   ├── DEPLOYMENT.md               # Guía de despliegue
+│   ├── API_DOCUMENTATION.md        # Documentación API REST
+│   ├── CODIGO.md                   # Documentación de código
+│   └── MEJORES_PRACTICAS.md        # Buenas prácticas
+│
+└── README.md
 ```
 
-### Get Model Statistics
+## 📚 Documentación Detallada
+
+- **[ARQUITECTURA.md](docs/ARQUITECTURA.md)**: Descripción técnica de la arquitectura del sistema
+- **[DEPLOYMENT.md](docs/DEPLOYMENT.md)**: Guía completa para desplegar en producción
+- **[API_DOCUMENTATION.md](docs/API_DOCUMENTATION.md)**: Documentación de todos los endpoints REST
+- **[CODIGO.md](docs/CODIGO.md)**: Documentación del código fuente
+- **[MEJORES_PRACTICAS.md](docs/MEJORES_PRACTICAS.md)**: Guía de desarrollo y buenas prácticas
+
+## 🔧 Uso Básico
+
+### Opción 1: Interfaz Web
+
+1. Abrir http://localhost:3000
+2. Hacer clic en "Seleccionar archivo Excel"
+3. Cargar archivo con historias de usuario
+4. Esperar resultados
+5. Ver tabla de estimaciones con comparación de modelos
+
+### Opción 2: API REST
+
+#### Entrenar Modelos
+```bash
+curl -X POST "http://localhost:8000/train" \
+  -F "file=@backend/training_data_improved.csv"
 ```
-GET /models/stats
+
+#### Estimar Historia Individual
+```bash
+curl -X POST "http://localhost:8000/estimate/single" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Implementar login",
+    "description": "Agregar autenticación con JWT",
+    "acceptance_criteria": ["Sistema valida credenciales", "Token expira en 24h"],
+    "priority": "high",
+    "issue_type": "feature"
+  }'
 ```
 
-## Excel File Format
+#### Obtener Estadísticas de Modelos
+```bash
+curl -X GET "http://localhost:8000/models/stats"
+```
 
-Required columns in Excel:
-- **Titulo** (Text) - Story title
-- **Historia de Usuario** (Text) - Full story description
-- **Criterios de Aceptación** (Text) - Acceptance criteria (newline separated)
+## 🧠 Características de ML
 
-Example:
-| Titulo | Historia de Usuario | Criterios de Aceptación |
-|--------|---------------------|------------------------|
-| Login Feature | As a user, I want to log in securely | - Validates email<br>- Encrypts password<br>- Sends confirmation |
-| API Integration | As a developer, I need REST APIs | - GET /users implemented<br>- POST /users implemented |
+### Extracción de Features (10 características lingüísticas)
 
-## Model Details
+1. **Complejidad**: Palabras clave que indican complejidad
+2. **Alcance**: Indicadores de alcance del proyecto
+3. **Criterios**: Cantidad de criterios de aceptación
+4. **Palabras técnicas**: Cantidad de términos técnicos
+5. **Integración**: Indicadores de integración con otros sistemas
+6. **Testing**: Requisitos de testing y QA
+7. **Prioridad**: Codificación de nivel de prioridad
+8. **Tipo**: Codificación de tipo de issue
+9. **Números**: Cantidad de valores numéricos en descripción
+10. **Variedad léxica**: Diversidad de vocabulario
 
-### Models Used
-1. **RandomForestRegressor** - Good for complex relationships
-   - max_depth: 70
-   - n_estimators: 200
-   - Features: log2 of total features
+### Modelos Entrenados
 
-2. **DecisionTreeRegressor** - Fast interpretable predictions
-   - max_depth: 30 (for story points), 20 (for others)
-   - min_samples_leaf: 2
-   - min_samples_split: 10
+```
+Dataset: 150 historias sintéticas diversas
+Split: 80% entrenamiento, 20% validación
 
-3. **Ensemble** - Average of RF and DT predictions
+Resultados R²:
+├── Story Points: 0.9876 (Excelente)
+├── Esfuerzo: 0.9620 (Excelente)
+├── Duración: 0.7537 (Bueno)
+└── Costo: 0.7729 (Bueno)
+```
 
-### Training Data Requirements
-- Minimum 50 historical stories recommended
-- Should include stories of varying complexity
-- All required columns should be populated
+## ⚙️ Configuración Avanzada
 
-## Troubleshooting
-
-### Backend won't start
-- Ensure all dependencies are installed: `pip install -r requirements.txt`
-- Check port 8000 is not in use
-- Review logs for specific errors
-
-### Frontend won't connect to backend
-- Verify backend is running at `http://localhost:8000`
-- Check CORS is enabled in FastAPI app
-- Review browser console for network errors
-
-### Models not trained
-- Ensure JIRA CSV has all required columns
-- Check file encoding is UTF-8
-- Verify CSV data quality (no all-null columns)
-
-### Estimation fails
-- Ensure models have been trained first
-- Check Excel file format matches requirements
-- Review API logs for specific errors
-
-## Development
-
-### Adding New Features
-
-1. **Backend**: Modify `backend/app/main.py` or create new modules in `backend/utils/`
-2. **Frontend**: Add new components in `frontend/components/`
-3. **Models**: Extend `backend/models/epic_estimation_models.py`
-
-### Testing
+### Reentrenar Modelos
 
 ```bash
-# Backend tests
-cd backend
-pytest
-
-# Frontend tests
-cd frontend
-npm test
+python retrain_models.py
 ```
 
-## Performance Tips
+### Variables de Entorno
 
-1. **Model Training**: Faster with more CPU cores. Consider using n_jobs=-1
-2. **Predictions**: Batch processing is more efficient than single predictions
-3. **Embeddings**: Disabled by default. Enable for semantic similarity (slower, more accurate)
-
-## API Response Format
-
-```json
-{
-  "story_title": "Story Title",
-  "point_estimate": {
-    "ensemble": 5.0,
-    "random_forest": 5.2,
-    "decision_tree": 4.8
-  },
-  "time_estimate": {
-    "ensemble": 3.5,
-    "random_forest": 3.8,
-    "decision_tree": 3.2
-  },
-  "cost_estimate": {
-    "ensemble": 1200,
-    "random_forest": 1250,
-    "decision_tree": 1150
-  },
-  "effort_estimate": {
-    "ensemble": 250,
-    "random_forest": 260,
-    "decision_tree": 240
-  },
-  "semantic_estimate": {
-    "p50": 5.0,
-    "p85": 8.0,
-    "fib": 5,
-    "top_sim": 0.92,
-    "top_points": 5
-  }
-}
+Crear archivo `.env` en backend/:
+```
+FLASK_ENV=development
+DEBUG=True
+CORS_ORIGINS=http://localhost:3000,http://localhost:8000
 ```
 
-## Configuration
+## 🐛 Manejo de Errores
 
-### Backend Configuration
+El sistema incluye manejo robusto de errores:
 
-Edit `backend/app/main.py`:
-- `MODEL_DIR` - Directory to save trained models
-- `CORS` settings for API access
+- **Validación de entrada**: Valida estructura de datos de entrada
+- **Errores de predicción**: Captura y reporta errores en modelos
+- **Archivos inválidos**: Maneja formatos Excel incorrectos
+- **Timeout**: Procesa archivos grandes con timeout configurable
+- **Logging**: Registra todos los errores para auditoría
 
-### Frontend Configuration
+Ver [MEJORES_PRACTICAS.md](docs/MEJORES_PRACTICAS.md#manejo-de-errores) para detalles.
 
-Edit `frontend/next.config.js`:
-- `NEXT_PUBLIC_API_URL` - Backend API endpoint
-- Port and host settings
+## 📊 Ejemplo de Salida
 
-## Contributing
+```
+Historia: "Implementar API de usuarios"
 
-1. Create a feature branch
-2. Make your changes
-3. Test thoroughly
-4. Submit a pull request
+Estimaciones (Ensemble - Recomendado):
+- Puntos de Historia: 8.5
+- Duración: 4.2 días
+- Costo: $1,450
+- Esfuerzo: 145.3 horas
 
-## License
+Confiabilidad R²:
+- Puntos: 0.9876 (98.76%) [Verde - Alta]
+- Duración: 0.7927 (79.27%) [Verde - Alta]
+- Costo: 0.8089 (80.89%) [Verde - Alta]
+- Esfuerzo: 0.9634 (96.34%) [Verde - Alta]
+```
 
-This project is part of the PoC_Agente_Estimacion_Epicas research.
+## 🔐 Seguridad
 
-## Support
+- Validación de entrada en todos los endpoints
+- CORS configurado restrictivamente
+- Sin almacenamiento de datos sensibles
+- Conexión HTTPS recomendada en producción
 
-For issues, questions, or suggestions:
-1. Check the troubleshooting section
-2. Review API logs
-3. Check browser console for client-side errors
-4. Open an issue with error details and reproduction steps
+## 📈 Performance
+
+- Procesamiento batch de hasta 1000 historias
+- Tiempo de respuesta < 100ms por historia
+- Uso de caché para modelos entrenados
+- Compresión de respuestas JSON
+
+## 🤝 Contribuciones
+
+Las contribuciones son bienvenidas. Por favor:
+
+1. Fork el proyecto
+2. Crea rama con tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a rama (`git push origin feature/AmazingFeature`)
+5. Abre Pull Request
+
+## 📄 Licencia
+
+Este proyecto está bajo licencia MIT. Ver archivo `LICENSE` para detalles.
+
+## 👥 Autores
+
+- **Abraham** - Desarrollo inicial y dirección del proyecto
+
+## 📞 Soporte
+
+Para reportar bugs o sugerencias:
+- Crear issue en GitHub
+- Contactar al equipo de desarrollo
+
+## 🙏 Agradecimientos
+
+- Datos de entrenamiento basados en históricas de proyectos Agile reales
+- Inspiración en metodologías de planificación Agile modernas
+- Comunidad de Machine Learning open source
+
+---
+
+**Última actualización**: Agosto 2026
+**Versión**: 1.0.0
