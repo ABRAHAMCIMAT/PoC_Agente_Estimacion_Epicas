@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app/backend
+      - ./Jira\ \(3\).csv:/data/Jira\ \(3\).csv
+      - ./HU_260226.xlsx:/data/HU_260226.xlsx
+    environment:
+      - PYTHONUNBUFFERED=1
+    command: python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    networks:
+      - epic-net
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app/frontend
+      - /app/frontend/node_modules
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    command: npm run dev
+    networks:
+      - epic-net
+    depends_on:
+      - backend
+
+networks:
+  epic-net:
+    driver: bridge
