@@ -459,27 +459,93 @@ async def get_model_stats():
 
 def create_feature_vector(request: StoryEstimationRequest) -> np.ndarray:
     """
-    Create feature vector from story request.
-    Match the 3-feature size used during training.
+    Create rich feature vector from story request.
+    Extracts features from title, description, and criteria.
     """
-    # Create features of size 3 (to match training with 3 numeric cols)
-    features = np.zeros((1, 3), dtype=np.float32)
+    import re
+    from collections import Counter
     
-    # Encode story characteristics
-    if request.priority:
-        priority_map = {'Low': 0.2, 'Medium': 0.5, 'High': 0.8, 'Critical': 1.0}
-        features[0, 0] = priority_map.get(request.priority, 0.5)
+    # Initialize 10-feature vector
+    features = np.zeros((1, 10), dtype=np.float32)
+    
+    title = request.title or ''
+    description = request.description or ''
+    criteria = ' '.join(request.acceptance_criteria or [])
+    full_text = f"{title} {description} {criteria}".lower()
+    
+    # Feature 0: Story complexity from title keywords
+    complexity_keywords = ['complex', 'difícil', 'difícil', 'integración', 'integration', 
+                          'refactor', 'refactorización', 'arquitectura', 'architecture',
+                          'seguridad', 'security', 'performance', 'database', 'api']
+    complexity_score = sum(1 for kw in complexity_keywords if kw in full_text)
+    features[0, 0] = min(complexity_score / 5.0, 1.0)
+    
+    # Feature 1: Story scope (text length normalized)
+    text_length = len(description)
+    features[0, 1] = min(text_length / 500.0, 1.0)
+    
+    # Feature 2: Number of acceptance criteria (indicates scope)
+    criteria_count = len(request.acceptance_criteria or [])
+    features[0, 2] = min(criteria_count / 5.0, 1.0)
+    
+    # Feature 3: Technical keywords (UI vs Backend vs Integration)
+    tech_keywords = ['api', 'base de datos', 'database', 'backend', 'servidor',
+                    'ui', 'frontend', 'interfaz', 'pantalla', 'screen', 'form',
+                    'autenticación', 'authentication', 'cache', 'performance']
+    tech_score = sum(1 for kw in tech_keywords if kw in full_text)
+    features[0, 3] = min(tech_score / 4.0, 1.0)
+    
+    # Feature 4: Data/Integration keywords
+    data_keywords = ['integración', 'integration', 'migración', 'migration', 'export',
+                    'import', 'sync', 'sincronización', 'datos', 'data', 'csv', 'excel',
+                    'api', 'rest', 'soap', 'webhook']
+    data_score = sum(1 for kw in data_keywords if kw in full_text)
+    features[0, 4] = min(data_score / 3.0, 1.0)
+    
+    # Feature 5: Testing requirements
+    testing_keywords = ['test', 'prueba', 'unitario', 'unit', 'integration',
+                       'validar', 'validación', 'verificar', 'qa']
+    testing_score = sum(1 for kw in testing_keywords if kw in full_text)
+    features[0, 5] = min(testing_score / 3.0, 1.0)
+    
+    # Feature 6: Priority encoding (from title hints)
+    priority_keywords = {
+        'urgent': 1.0, 'crítico': 1.0, 'critical': 1.0,
+        'alta': 0.8, 'high': 0.8, 'importante': 0.8,
+        'media': 0.5, 'medium': 0.5, 'normal': 0.5,
+        'baja': 0.2, 'low': 0.2, 'menor': 0.2
+    }
+    priority_score = 0.5
+    for kw, score in priority_keywords.items():
+        if kw in full_text:
+            priority_score = score
+            break
+    features[0, 6] = priority_score
+    
+    # Feature 7: Issue type hints
+    type_keywords = {
+        'feature': 0.8, 'característica': 0.8, 'nueva': 0.8,
+        'bug': 0.4, 'error': 0.4, 'corrección': 0.4,
+        'tarea': 0.3, 'task': 0.3, 'refactor': 0.6
+    }
+    type_score = 0.5
+    for kw, score in type_keywords.items():
+        if kw in full_text:
+            type_score = score
+            break
+    features[0, 7] = type_score
+    
+    # Feature 8: Number words (estimation hints)
+    numbers = re.findall(r'\d+', description)
+    features[0, 8] = min(len(numbers) / 3.0, 1.0)
+    
+    # Feature 9: Unique word variety (simpler = more straightforward)
+    words = description.split()
+    if words:
+        unique_ratio = len(set(words)) / max(len(words), 1)
+        features[0, 9] = unique_ratio
     else:
-        features[0, 0] = 0.5
-    
-    if request.issue_type:
-        type_map = {'Story': 0.2, 'Task': 0.4, 'Bug': 0.6, 'Feature': 0.8}
-        features[0, 1] = type_map.get(request.issue_type, 0.5)
-    else:
-        features[0, 1] = 0.5
-    
-    # Text length features (normalized)
-    features[0, 2] = min(len(request.description or ''), 500) / 500.0
+        features[0, 9] = 0.5
     
     return features
 
