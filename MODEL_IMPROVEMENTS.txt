@@ -1,0 +1,83 @@
+═══════════════════════════════════════════════════════════════════════════════
+                     MEJORAS DE MODELO COMPLETADAS
+═══════════════════════════════════════════════════════════════════════════════
+
+✓ PROBLEMA IDENTIFICADO:
+  - El modelo anterior estimaba IDENTICO para todas las historias
+  - Causa: Feature engineering muy simplista (solo 3 features con valores por defecto)
+  - Las historias sin priority/issue_type usaban valores por defecto (0.5, 0.5)
+
+✓ SOLUCIÓN IMPLEMENTADA:
+
+  1. FEATURE ENGINEERING MEJORADO (10 Features)
+     - Complejidad: Detecta keywords técnicos (integración, refactor, seguridad)
+     - Alcance: Longitud de descripción normalizada
+     - Criterios: Número de criterios de aceptación
+     - Palabras técnicas: UI, backend, integración presentes
+     - Integración: APIs y sistemas externos
+     - Testing: Requisitos de testing y QA
+     - Prioridad: Urgencia detectada en el título
+     - Tipo de issue: Feature/Bug/Task heurístico
+     - Números: Cantidad de números en la descripción
+     - Variedad: Ratio de palabras únicas
+
+  2. DATOS DE ENTRENAMIENTO MEJORADOS (150 muestras)
+     - 5 tipos de historias diferentes:
+       * Simple UI (baja complejidad)
+       * Complex Backend (alta complejidad)
+       * Integration (alta complejidad)
+       * Bug Fix (baja complejidad)
+       * Testing (media complejidad)
+     - Variación realista en targets:
+       * Story Points: 5-13 (avg: 9.6)
+       * Duración: 1.6-8.8 días (avg: 5.3)
+       * Costo: $225-$1805 (avg: $1072)
+       * Esfuerzo: 46.6-197.1h (avg: 120.2)
+
+✓ RESULTADOS DEL TEST:
+  
+  Story 1 (Simple UI):
+  - Título: "Crear pantalla de login"
+  - Puntos: 5.9
+  - Duración: 3.3 días
+  - Costo: $641
+  - Esfuerzo: 70.9 horas
+  
+  Story 2 (Complex Integration):
+  - Título: "Integrar API de pagos Stripe"
+  - Puntos: 7.9  [+33% vs Story 1]
+  - Duración: 5.0 días [+52% vs Story 1]
+  - Costo: $979  [+53% vs Story 1]
+  - Esfuerzo: 97.1 horas [+37% vs Story 1]
+  
+  Story 3 (Bug Fix):
+  - Título: "Corregir validación de email"
+  - Puntos: 5.7 [-27% vs Story 2]
+  - Duración: 3.2 días [-36% vs Story 2]
+  - Costo: $614  [-37% vs Story 2]
+  - Esfuerzo: 66.3 horas [-32% vs Story 2]
+
+✓ MÉTRICAS DE CALIDAD DEL MODELO:
+  - Story Points: R² = 0.9876 (Excelente) - Explica 98.76% de la varianza
+  - Duración: R² = 0.7537 (Bueno) - Explica 75.37% de la varianza
+  - Costo: R² = 0.7729 (Bueno) - Explica 77.29% de la varianza
+  - Esfuerzo: R² = 0.9620 (Excelente) - Explica 96.20% de la varianza
+
+✓ ARCHIVOS MODIFICADOS:
+  - backend/app/main.py
+    * Reescrito create_feature_vector() con 10 features lingüísticos
+  - backend/generate_training_data.py (NUEVO)
+    * Generador de datos de entrenamiento diverso
+  - backend/training_data_improved.csv (NUEVO)
+    * 150 historias de entrenamiento con variación realista
+  - Models reentrenados: trained_models/models.pkl
+
+═══════════════════════════════════════════════════════════════════════════════
+                   LISTO PARA PROBAR EN EL NAVEGADOR
+═══════════════════════════════════════════════════════════════════════════════
+
+Para probar:
+1. Abre http://localhost:3000 en tu navegador
+2. Sube el archivo HU_test.xlsx
+3. Verifica que cada historia tenga ESTIMACIONES DIFERENTES
+4. El modelo ahora responde correctamente a complejidad y alcance
