@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import styles from '../styles/EstimationResults.module.css';
 
 export default function EstimationResults({ results }) {
   const [expandedStory, setExpandedStory] = useState(null);
@@ -60,17 +59,17 @@ export default function EstimationResults({ results }) {
   if (!results) return null;
 
   return (
-    <div className={styles.resultsSection}>
-      <div className={styles.header}>
+    <div className="results-section">
+      <div className="results-header">
         <h2>📈 Estimation Results</h2>
-        <div className={styles.stats}>
+        <div className="results-stats">
           <span>✅ {results.successful} estimated</span>
           {results.failed > 0 && <span>❌ {results.failed} failed</span>}
         </div>
       </div>
 
       {results.errors && results.errors.length > 0 && (
-        <div className={styles.errors}>
+        <div className="results-errors">
           <h3>⚠️ Errors:</h3>
           {results.errors.map((error, idx) => (
             <p key={idx}>{error.story}: {error.error}</p>
@@ -80,57 +79,57 @@ export default function EstimationResults({ results }) {
 
       {results.successful > 0 && (
         <>
-          <button className={styles.exportBtn} onClick={exportToCSV}>
+          <button className="export-btn" onClick={exportToCSV}>
             📊 Export to CSV
           </button>
 
-          <div className={styles.storyList}>
+          <div className="story-list">
             {results.results.map((story, index) => (
-              <div key={index} className={styles.storyCard}>
+              <div key={index} className="story-card">
                 <div 
-                  className={styles.storyHeader}
+                  className="story-header"
                   onClick={() => toggleExpand(index)}
                 >
-                  <div className={styles.titleSection}>
+                  <div className="title-section">
                     <h3>{story.story_title}</h3>
                   </div>
-                  <div className={styles.summaryMetrics}>
-                    <span className={styles.metric}>
-                      <span className={styles.label}>Points:</span>
-                      <span className={styles.value}>
+                  <div className="summary-metrics">
+                    <span className="metric">
+                      <span className="label">Points:</span>
+                      <span className="value">
                         {story.point_estimate.ensemble.toFixed(1)}
                       </span>
                     </span>
-                    <span className={styles.metric}>
-                      <span className={styles.label}>Days:</span>
-                      <span className={styles.value}>
+                    <span className="metric">
+                      <span className="label">Days:</span>
+                      <span className="value">
                         {story.time_estimate.ensemble.toFixed(1)}
                       </span>
                     </span>
-                    <span className={styles.metric}>
-                      <span className={styles.label}>Cost:</span>
-                      <span className={styles.value}>
+                    <span className="metric">
+                      <span className="label">Cost:</span>
+                      <span className="value">
                         ${story.cost_estimate.ensemble.toFixed(0)}
                       </span>
                     </span>
-                    <span className={styles.metric}>
-                      <span className={styles.label}>Effort:</span>
-                      <span className={styles.value}>
+                    <span className="metric">
+                      <span className="label">Effort:</span>
+                      <span className="value">
                         {story.effort_estimate.ensemble.toFixed(1)}
                       </span>
                     </span>
                   </div>
-                  <span className={styles.expandIcon}>
+                  <span className="expand-icon">
                     {expandedStory === index ? '▼' : '▶'}
                   </span>
                 </div>
 
                 {expandedStory === index && (
-                  <div className={styles.storyDetails}>
-                    <div className={styles.modelComparison}>
+                  <div className="story-details">
+                    <div className="model-comparison">
                       <h4>Model Comparison (Ensemble vs Individual)</h4>
                       
-                      <table className={styles.comparisonTable}>
+                      <table className="comparison-table">
                         <thead>
                           <tr>
                             <th>Metric</th>
@@ -169,7 +168,7 @@ export default function EstimationResults({ results }) {
                     </div>
 
                     {story.semantic_estimate && (
-                      <div className={styles.semanticEstimate}>
+                      <div className="semantic-estimate">
                         <h4>Semantic Similarity Estimate</h4>
                         <p>
                           Based on similar historical stories:

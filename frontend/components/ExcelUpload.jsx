@@ -1,5 +1,4 @@
 import React, { useRef } from 'react';
-import styles from '../styles/ExcelUpload.module.css';
 
 export default function ExcelUpload({ onUpload, loading }) {
   const fileInputRef = useRef(null);
@@ -17,16 +16,16 @@ export default function ExcelUpload({ onUpload, loading }) {
 
   const handleDragOver = (e) => {
     e.preventDefault();
-    e.currentTarget.classList.add(styles.dragOver);
+    e.currentTarget.classList.add('drag-over');
   };
 
   const handleDragLeave = (e) => {
-    e.currentTarget.classList.remove(styles.dragOver);
+    e.currentTarget.classList.remove('drag-over');
   };
 
   const handleDrop = (e) => {
     e.preventDefault();
-    e.currentTarget.classList.remove(styles.dragOver);
+    e.currentTarget.classList.remove('drag-over');
     
     const file = e.dataTransfer.files?.[0];
     if (file) {
@@ -39,20 +38,20 @@ export default function ExcelUpload({ onUpload, loading }) {
   };
 
   return (
-    <div className={styles.card}>
+    <div className="upload-card">
       <h2>Upload Stories for Estimation</h2>
       
       <div 
-        className={styles.dropZone}
+        className="drop-zone"
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         onClick={() => fileInputRef.current?.click()}
       >
-        <div className={styles.icon}>📁</div>
+        <div className="drop-icon">📁</div>
         <h3>Drag and drop Excel file here</h3>
         <p>or click to browse</p>
-        <p className={styles.formats}>Supported: .xlsx, .xls</p>
+        <p className="formats">Supported: .xlsx, .xls</p>
       </div>
 
       <input
@@ -64,13 +63,13 @@ export default function ExcelUpload({ onUpload, loading }) {
       />
 
       {loading && (
-        <div className={styles.loading}>
-          <div className={styles.spinner}></div>
+        <div className="loading">
+          <div className="spinner"></div>
           <p>Processing stories...</p>
         </div>
       )}
 
-      <div className={styles.requirements}>
+      <div className="requirements">
         <h4>Required Excel Columns:</h4>
         <ul>
           <li><strong>Titulo</strong> - Story title</li>

@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import ExcelUpload from '../components/ExcelUpload';
 import EstimationResults from '../components/EstimationResults';
 import Header from '../components/Header';
-import styles from '../styles/Home.module.css';
 
 export default function Home() {
   const [results, setResults] = useState(null);
@@ -38,11 +37,11 @@ export default function Home() {
   };
 
   return (
-    <div className={styles.container}>
+    <div className="page-container">
       <Header />
       
-      <main className={styles.main}>
-        <section className={styles.uploadSection}>
+      <main className="main-content">
+        <section className="upload-section">
           <ExcelUpload 
             onUpload={handleExcelUpload} 
             loading={loading}
@@ -50,7 +49,7 @@ export default function Home() {
         </section>
 
         {error && (
-          <div className={styles.error}>
+          <div className="error-message">
             <p>❌ Error: {error}</p>
           </div>
         )}

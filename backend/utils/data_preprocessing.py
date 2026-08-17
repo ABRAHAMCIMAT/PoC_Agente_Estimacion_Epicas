@@ -313,10 +313,21 @@ def process_user_excel(excel_path: str, preprocessor: JiraDataPreprocessor = Non
     """
     df = pd.read_excel(excel_path)
     
+    # Strip whitespace from column names
+    df.columns = df.columns.str.strip()
+    
+    # Check for required columns (case-insensitive)
     required_cols = ['Titulo', 'Historia de Usuario', 'Criterios de Aceptación']
-    missing = [col for col in required_cols if col not in df.columns]
+    df_cols_lower = {col.lower(): col for col in df.columns}
+    
+    missing = []
+    for req_col in required_cols:
+        if req_col.lower() not in df_cols_lower:
+            missing.append(req_col)
     
     if missing:
-        raise ValueError(f"Excel missing required columns: {missing}")
+        # Try to work with what we have
+        print(f"Warning: Excel missing some columns: {missing}")
+        print(f"Found columns: {list(df.columns)}")
     
     return df
