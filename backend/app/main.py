@@ -194,43 +194,61 @@ async def train_models(
             
             print(f"[INFO] Loaded {len(df)} rows with columns: {df.columns.tolist()}")
             
-            # Create simple feature matrix if we have the needed columns
+            # Required columns: target plus the text columns feature
+            # extraction is based on
             required_col = 'Custom field (Story Points)'
-            
+            text_cols = ['Titulo', 'Historia de Usuario', 'Criterios de Aceptación']
+
             if required_col not in df.columns:
                 raise ValueError(f"Missing required column: {required_col}")
-            
+
+            missing_text_cols = [c for c in text_cols if c not in df.columns]
+            if missing_text_cols:
+                raise ValueError(f"Missing required columns for feature extraction: {missing_text_cols}")
+
             # Drop rows with missing target
             df = df.dropna(subset=[required_col])
-            
+
             if len(df) < 10:
                 raise ValueError(f"Not enough data: {len(df)} rows after cleaning")
-            
-            # Prepare features
-            numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
-            if required_col in numeric_cols:
-                numeric_cols.remove(required_col)
-            
-            if len(numeric_cols) == 0:
-                # Create synthetic features from row count
-                numeric_cols = ['point_estimates']
-                df[numeric_cols[0]] = range(1, len(df) + 1)
-            
-            X = df[numeric_cols].fillna(df[numeric_cols].median())
-            # Limit to 3 features for consistency
-            X = X.values[:, :min(3, X.shape[1])]
-            
-            # If we have fewer than 3 features, pad with zeros
-            if X.shape[1] < 3:
-                padding = np.zeros((X.shape[0], 3 - X.shape[1]))
-                X = np.hstack([X, padding])
-            
-            # Prepare targets
-            y_points = df[required_col].values
-            y_time = y_points * np.random.uniform(0.8, 1.2, len(y_points))
-            y_cost = y_points * np.random.uniform(200, 400, len(y_points))
-            y_effort = y_points * np.random.uniform(4, 16, len(y_points))
-            
+
+            # Build the same 10-feature linguistic vector used at prediction
+            # time, so the trained scaler/models match what /estimate/* sends
+            X_features = []
+            for _, row in df.iterrows():
+                criteria_raw = row.get('Criterios de Aceptación', '')
+                criteria_list = []
+                if pd.notna(criteria_raw) and isinstance(criteria_raw, str):
+                    criteria_list = [c.strip() for c in criteria_raw.split('\n') if c.strip()]
+
+                story_req = StoryEstimationRequest(
+                    title=str(row.get('Titulo', '')),
+                    description=str(row.get('Historia de Usuario', '')),
+                    acceptance_criteria=criteria_list or None
+                )
+                X_features.append(create_feature_vector(story_req)[0])
+
+            X = np.array(X_features, dtype=np.float32)
+
+            # Prepare targets: use the real sprint/cost/effort columns when
+            # available, falling back to synthetic values only if absent
+            y_points = df[required_col].values.astype(np.float32)
+
+            if 'Duracion_Sprint' in df.columns:
+                y_time = df['Duracion_Sprint'].fillna(df['Duracion_Sprint'].median()).values.astype(np.float32)
+            else:
+                y_time = y_points * np.random.uniform(0.8, 1.2, len(y_points))
+
+            if 'Costo_por_dia' in df.columns:
+                y_cost = df['Costo_por_dia'].fillna(df['Costo_por_dia'].median()).values.astype(np.float32)
+            else:
+                y_cost = y_points * np.random.uniform(200, 400, len(y_points))
+
+            if 'Esfuerzo_por_Puntos_Historia' in df.columns:
+                y_effort = df['Esfuerzo_por_Puntos_Historia'].fillna(df['Esfuerzo_por_Puntos_Historia'].median()).values.astype(np.float32)
+            else:
+                y_effort = y_points * np.random.uniform(4, 16, len(y_points))
+
             y_dict = {
                 'point': y_points,
                 'time': y_time,
