@@ -11,19 +11,19 @@ export default function EstimationResults({ results }) {
     if (!results?.results?.length) return;
 
     const headers = [
-      'Story Title',
-      'Story Points (Ensemble)',
-      'Time (Days) (Ensemble)',
-      'Cost ($) (Ensemble)',
-      'Effort (Ensemble)',
-      'Points (RF)',
-      'Points (DT)',
-      'Time (RF)',
-      'Time (DT)',
-      'Cost (RF)',
-      'Cost (DT)',
-      'Effort (RF)',
-      'Effort (DT)'
+      'Título de Historia',
+      'Puntos (Ensemble)',
+      'Días (Ensemble)',
+      'Costo (Ensemble)',
+      'Esfuerzo (Ensemble)',
+      'Puntos (RF)',
+      'Puntos (DT)',
+      'Días (RF)',
+      'Días (DT)',
+      'Costo (RF)',
+      'Costo (DT)',
+      'Esfuerzo (RF)',
+      'Esfuerzo (DT)'
     ];
 
     const rows = results.results.map(r => [
@@ -51,7 +51,7 @@ export default function EstimationResults({ results }) {
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `estimations-${new Date().toISOString().split('T')[0]}.csv`;
+    link.download = `estimaciones-${new Date().toISOString().split('T')[0]}.csv`;
     link.click();
     window.URL.revokeObjectURL(url);
   };
@@ -61,16 +61,16 @@ export default function EstimationResults({ results }) {
   return (
     <div className="results-section">
       <div className="results-header">
-        <h2>📈 Estimation Results</h2>
+        <h2>📈 Resultados de Estimación</h2>
         <div className="results-stats">
-          <span>✅ {results.successful} estimated</span>
-          {results.failed > 0 && <span>❌ {results.failed} failed</span>}
+          <span>[OK] {results.successful} estimadas</span>
+          {results.failed > 0 && <span>[ERROR] {results.failed} fallidas</span>}
         </div>
       </div>
 
       {results.errors && results.errors.length > 0 && (
         <div className="results-errors">
-          <h3>⚠️ Errors:</h3>
+          <h3>[ALERTA] Errores:</h3>
           {results.errors.map((error, idx) => (
             <p key={idx}>{error.story}: {error.error}</p>
           ))}
@@ -80,7 +80,7 @@ export default function EstimationResults({ results }) {
       {results.successful > 0 && (
         <>
           <button className="export-btn" onClick={exportToCSV}>
-            📊 Export to CSV
+            📊 Descargar CSV
           </button>
 
           <div className="story-list">
@@ -95,25 +95,25 @@ export default function EstimationResults({ results }) {
                   </div>
                   <div className="summary-metrics">
                     <span className="metric">
-                      <span className="label">Points:</span>
+                      <span className="label">Puntos:</span>
                       <span className="value">
                         {story.point_estimate.ensemble.toFixed(1)}
                       </span>
                     </span>
                     <span className="metric">
-                      <span className="label">Days:</span>
+                      <span className="label">Días:</span>
                       <span className="value">
                         {story.time_estimate.ensemble.toFixed(1)}
                       </span>
                     </span>
                     <span className="metric">
-                      <span className="label">Cost:</span>
+                      <span className="label">Costo:</span>
                       <span className="value">
                         ${story.cost_estimate.ensemble.toFixed(0)}
                       </span>
                     </span>
                     <span className="metric">
-                      <span className="label">Effort:</span>
+                      <span className="label">Esfuerzo:</span>
                       <span className="value">
                         {story.effort_estimate.ensemble.toFixed(1)}
                       </span>
@@ -127,38 +127,38 @@ export default function EstimationResults({ results }) {
                 {expandedStory === index && (
                   <div className="story-details">
                     <div className="model-comparison">
-                      <h4>Model Comparison (Ensemble vs Individual)</h4>
+                      <h4>Comparación de Modelos (Ensemble vs Individual)</h4>
                       
                       <table className="comparison-table">
                         <thead>
                           <tr>
-                            <th>Metric</th>
+                            <th>Métrica</th>
                             <th>Ensemble</th>
                             <th>Random Forest</th>
-                            <th>Decision Tree</th>
+                            <th>Árbol de Decisión</th>
                           </tr>
                         </thead>
                         <tbody>
                           <tr>
-                            <td>Story Points</td>
+                            <td>Puntos de Historia</td>
                             <td><strong>{story.point_estimate.ensemble.toFixed(2)}</strong></td>
                             <td>{story.point_estimate.random_forest.toFixed(2)}</td>
                             <td>{story.point_estimate.decision_tree.toFixed(2)}</td>
                           </tr>
                           <tr>
-                            <td>Duration (Days)</td>
+                            <td>Duración (Días)</td>
                             <td><strong>{story.time_estimate.ensemble.toFixed(2)}</strong></td>
                             <td>{story.time_estimate.random_forest.toFixed(2)}</td>
                             <td>{story.time_estimate.decision_tree.toFixed(2)}</td>
                           </tr>
                           <tr>
-                            <td>Cost ($)</td>
+                            <td>Costo ($)</td>
                             <td><strong>${story.cost_estimate.ensemble.toFixed(2)}</strong></td>
                             <td>${story.cost_estimate.random_forest.toFixed(2)}</td>
                             <td>${story.cost_estimate.decision_tree.toFixed(2)}</td>
                           </tr>
                           <tr>
-                            <td>Effort</td>
+                            <td>Esfuerzo</td>
                             <td><strong>{story.effort_estimate.ensemble.toFixed(2)}</strong></td>
                             <td>{story.effort_estimate.random_forest.toFixed(2)}</td>
                             <td>{story.effort_estimate.decision_tree.toFixed(2)}</td>
@@ -169,12 +169,12 @@ export default function EstimationResults({ results }) {
 
                     {story.semantic_estimate && (
                       <div className="semantic-estimate">
-                        <h4>Semantic Similarity Estimate</h4>
+                        <h4>Estimación por Similitud Semántica</h4>
                         <p>
-                          Based on similar historical stories:
-                          50th percentile: {story.semantic_estimate.p50.toFixed(1)} points,
-                          85th percentile: {story.semantic_estimate.p85.toFixed(1)} points,
-                          Fibonacci-rounded: {story.semantic_estimate.fib.toFixed(0)} points
+                          Basado en historias similares:
+                          Percentil 50: {story.semantic_estimate.p50.toFixed(1)} puntos,
+                          Percentil 85: {story.semantic_estimate.p85.toFixed(1)} puntos,
+                          Fibonacci: {story.semantic_estimate.fib.toFixed(0)} puntos
                         </p>
                       </div>
                     )}

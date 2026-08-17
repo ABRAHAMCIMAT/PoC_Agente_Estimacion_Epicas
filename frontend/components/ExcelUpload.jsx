@@ -7,7 +7,7 @@ export default function ExcelUpload({ onUpload, loading }) {
     const file = event.target.files?.[0];
     if (file) {
       if (!file.name.match(/\.(xlsx|xls)$/)) {
-        alert('Please select an Excel file (.xlsx or .xls)');
+        alert('Por favor selecciona un archivo Excel (.xlsx o .xls)');
         return;
       }
       onUpload(file);
@@ -30,7 +30,7 @@ export default function ExcelUpload({ onUpload, loading }) {
     const file = e.dataTransfer.files?.[0];
     if (file) {
       if (!file.name.match(/\.(xlsx|xls)$/)) {
-        alert('Please drop an Excel file (.xlsx or .xls)');
+        alert('Por favor suelta un archivo Excel (.xlsx o .xls)');
         return;
       }
       onUpload(file);
@@ -39,7 +39,7 @@ export default function ExcelUpload({ onUpload, loading }) {
 
   return (
     <div className="upload-card">
-      <h2>Upload Stories for Estimation</h2>
+      <h2>Subir Historias de Usuario para Estimación</h2>
       
       <div 
         className="drop-zone"
@@ -49,9 +49,9 @@ export default function ExcelUpload({ onUpload, loading }) {
         onClick={() => fileInputRef.current?.click()}
       >
         <div className="drop-icon">📁</div>
-        <h3>Drag and drop Excel file here</h3>
-        <p>or click to browse</p>
-        <p className="formats">Supported: .xlsx, .xls</p>
+        <h3>Arrastra y suelta tu archivo Excel aquí</h3>
+        <p>o haz clic para explorar</p>
+        <p className="formats">Formatos soportados: .xlsx, .xls</p>
       </div>
 
       <input
@@ -65,16 +65,16 @@ export default function ExcelUpload({ onUpload, loading }) {
       {loading && (
         <div className="loading">
           <div className="spinner"></div>
-          <p>Processing stories...</p>
+          <p>Procesando historias...</p>
         </div>
       )}
 
       <div className="requirements">
-        <h4>Required Excel Columns:</h4>
+        <h4>Columnas Requeridas en Excel:</h4>
         <ul>
-          <li><strong>Titulo</strong> - Story title</li>
-          <li><strong>Historia de Usuario</strong> - Story description</li>
-          <li><strong>Criterios de Aceptación</strong> - Acceptance criteria</li>
+          <li><strong>Titulo</strong> - Título de la historia</li>
+          <li><strong>Historia de Usuario</strong> - Descripción de la historia</li>
+          <li><strong>Criterios de Aceptación</strong> - Criterios de aceptación</li>
         </ul>
       </div>
     </div>

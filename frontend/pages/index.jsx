@@ -23,14 +23,14 @@ export default function Home() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.detail || 'Failed to estimate stories');
+        throw new Error(errorData.detail || 'Error al estimar las historias');
       }
 
       const data = await response.json();
       setResults(data);
     } catch (err) {
-      setError(err.message || 'An error occurred');
-      console.error('Upload error:', err);
+      setError(err.message || 'Ha ocurrido un error');
+      console.error('Error de carga:', err);
     } finally {
       setLoading(false);
     }
@@ -50,7 +50,7 @@ export default function Home() {
 
         {error && (
           <div className="error-message">
-            <p>❌ Error: {error}</p>
+            <p>[ERROR] Error: {error}</p>
           </div>
         )}
 
