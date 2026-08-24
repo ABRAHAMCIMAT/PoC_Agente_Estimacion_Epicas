@@ -59,6 +59,9 @@ backend/trained_models/
 tmp/
 temp/
 
+# start.sh runtime state (logs, chosen ports)
+.run/
+
 # Test coverage
 htmlcov/
 .coverage
