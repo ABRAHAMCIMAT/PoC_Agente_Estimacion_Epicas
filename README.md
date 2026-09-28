@@ -41,7 +41,7 @@ Sistema fullstack basado en Machine Learning para estimar automáticamente punto
 ### 1. Clonar Repositorio
 
 ```bash
-git clone https://github.com/abrahamtec/PoC_Agente_Estimacion_Epicas.git
+git clone https://github.com/ABRAHAMCIMAT/PoC_Agente_Estimacion_Epicas.git
 cd PoC_Agente_Estimacion_Epicas
 ```
 

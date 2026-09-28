@@ -20,7 +20,7 @@
 ### Paso 1: Clonar Repositorio
 
 ```bash
-git clone https://github.com/abrahamtec/PoC_Agente_Estimacion_Epicas.git
+git clone https://github.com/ABRAHAMCIMAT/PoC_Agente_Estimacion_Epicas.git
 cd PoC_Agente_Estimacion_Epicas
 cd PoC_Agente_Estimacion_Epicas.worktrees/integrar-frontend-backend-excel-upload
 ```
@@ -196,7 +196,7 @@ sudo apt-get install python3.9 python3-pip python3-venv
 
 # Clonar repositorio
 cd /opt
-sudo git clone https://github.com/abrahamtec/PoC_Agente_Estimacion_Epicas.git
+sudo git clone https://github.com/ABRAHAMCIMAT/PoC_Agente_Estimacion_Epicas.git
 cd PoC_Agente_Estimacion_Epicas/backend
 
 # Crear entorno virtual
