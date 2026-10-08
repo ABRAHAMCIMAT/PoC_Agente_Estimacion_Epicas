@@ -66,6 +66,12 @@ temp/
 htmlcov/
 .coverage
 .pytest_cache/
+backend/coverage.xml
+frontend/coverage/
+
+# SonarQube local
+.scannerwork/
+.env.sonar
 
 # Package lock files (optional, uncomment if working in team)
 # package-lock.json

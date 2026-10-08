@@ -3,18 +3,19 @@ Generate improved synthetic training data for epic estimation.
 Creates diverse stories with realistic feature distributions.
 """
 
-import pandas as pd
+from typing import List
+
 import numpy as np
-import re
-from typing import List, Dict
+import pandas as pd
+
 
 class TrainingDataGenerator:
     def __init__(self, random_seed: int = 42):
         np.random.seed(random_seed)
-    
+
     def generate_stories(self, n_samples: int = 200) -> pd.DataFrame:
         """Generate diverse synthetic stories."""
-        
+
         # Templates for different story types
         story_templates = {
             'simple_ui': {
@@ -78,38 +79,38 @@ class TrainingDataGenerator:
                 'scope': 'medium'
             }
         }
-        
+
         stories = []
         story_type_list = list(story_templates.keys())
-        
+
         for i in range(n_samples):
             # Choose random story type
             story_type = np.random.choice(story_type_list)
             template = story_templates[story_type]
-            
+
             # Generate story
             title_template = np.random.choice(template['titles'])
             feature = np.random.choice(template['features'])
             title = title_template.format(feature=feature)
-            
+
             # Generate description based on story type and complexity
             description = self._generate_description(
-                title, 
+                title,
                 story_type,
                 template['complexity'],
                 template['scope']
             )
-            
+
             # Generate acceptance criteria
             criteria = self._generate_criteria(story_type, template['complexity'])
             criteria_str = '\n'.join(criteria)
-            
+
             # Calculate targets based on story characteristics
             points = self._estimate_points(template['complexity'], len(criteria), len(description))
             duration = self._estimate_duration(points)
             cost = self._estimate_cost(points, duration)
             effort = self._estimate_effort(points, template['complexity'])
-            
+
             stories.append({
                 'Titulo': title,
                 'Historia de Usuario': description,
@@ -119,12 +120,12 @@ class TrainingDataGenerator:
                 'Costo_por_dia': cost,
                 'Esfuerzo_por_Puntos_Historia': effort
             })
-        
+
         return pd.DataFrame(stories)
-    
+
     def _generate_description(self, title: str, story_type: str, complexity: float, scope: str) -> str:
         """Generate realistic story description."""
-        
+
         descriptions = {
             'simple_ui': [
                 'Se necesita crear una interfaz de usuario intuitiva que permita a los usuarios {action}. El diseño debe ser responsive y compatible con dispositivos móviles.',
@@ -152,7 +153,7 @@ class TrainingDataGenerator:
                 'Implementar tests de rendimiento para {action}. Validar bajo carga alta.',
             ]
         }
-        
+
         action_map = {
             'simple_ui': 'permite a los usuarios ingresar información',
             'complex_backend': 'procesa datos y genera reportes',
@@ -160,10 +161,10 @@ class TrainingDataGenerator:
             'bug_fix': 'se valida correctamente la entrada',
             'testing': 'funciona correctamente en todos los casos'
         }
-        
+
         base_desc = np.random.choice(descriptions.get(story_type, descriptions['simple_ui']))
         full_desc = base_desc.format(action=action_map.get(story_type, 'funciona'))
-        
+
         # Add complexity-dependent details
         if complexity > 0.7:
             full_desc += ' Requerirá análisis detallado, diseño de arquitectura y múltiples iteraciones de implementación.'
@@ -171,12 +172,12 @@ class TrainingDataGenerator:
             full_desc += ' Incluye múltiples componentes y requiere coordinación entre equipos.'
         else:
             full_desc += ' Tarea de alcance limitado y bien definida.'
-        
+
         return full_desc
-    
+
     def _generate_criteria(self, story_type: str, complexity: float) -> List[str]:
         """Generate acceptance criteria."""
-        
+
         base_criteria = {
             'simple_ui': [
                 'La interfaz debe ser responsive y funcionar en dispositivos móviles',
@@ -210,104 +211,104 @@ class TrainingDataGenerator:
                 'Incluir tests de caso límite',
             ]
         }
-        
+
         criteria = base_criteria.get(story_type, base_criteria['simple_ui']).copy()
-        
+
         # Add extra criteria based on complexity
         if complexity > 0.8:
             criteria.append('Realizar revisión de seguridad')
             criteria.append('Validar rendimiento bajo carga')
-        
+
         if complexity > 0.6:
             criteria.append('Incluir documentación técnica')
-        
+
         return criteria[:max(2, int(2 + complexity * 3))]
-    
+
     def _estimate_points(self, complexity: float, criteria_count: int, desc_length: int) -> float:
         """Estimate story points realistically."""
-        
+
         # Base points on complexity
         base_points = 1 + complexity * 12
-        
+
         # Adjust by criteria count
         criteria_adjustment = (criteria_count - 1) * 0.5
-        
+
         # Adjust by description length
         length_adjustment = min(desc_length / 200, 2) * 0.5
-        
+
         points = base_points + criteria_adjustment + length_adjustment
-        
+
         # Add some randomness
         points += np.random.normal(0, 0.5)
-        
+
         # Fibonacci sequence (1, 2, 3, 5, 8, 13)
         fibonacci = [1, 2, 3, 5, 8, 13]
         closest = min(fibonacci, key=lambda x: abs(x - points))
-        
+
         return max(1, float(closest))
-    
+
     def _estimate_duration(self, points: float) -> float:
         """Estimate sprint duration in days."""
-        
+
         # Linear relationship: more points = more days
         duration = 0.5 + (points / 2.0)
-        
+
         # Add randomness
         duration += np.random.normal(0, 0.8)
-        
+
         return max(0.5, float(duration))
-    
+
     def _estimate_cost(self, points: float, duration: float) -> float:
         """Estimate cost in dollars."""
-        
+
         # Assume $200/day developer rate
         daily_rate = 200
-        
+
         cost = daily_rate * duration
-        
+
         # Add randomness
         cost += np.random.normal(0, 100)
-        
+
         return max(100, float(cost))
-    
+
     def _estimate_effort(self, points: float, complexity: float) -> float:
         """Estimate effort in hours."""
-        
+
         # Base: ~12 hours per story point
         effort = points * 12
-        
+
         # Complexity multiplier
         effort *= (0.8 + complexity * 0.4)
-        
+
         # Add randomness
         effort += np.random.normal(0, 8)
-        
+
         return max(4, float(effort))
 
 
 def main():
     """Generate and save training data."""
-    
+
     print("Generating improved training data...")
     generator = TrainingDataGenerator(random_seed=42)
-    
+
     # Generate 150 diverse stories
     df = generator.generate_stories(n_samples=150)
-    
+
     # Save to CSV
     output_file = 'training_data_improved.csv'
     df.to_csv(output_file, index=False, encoding='utf-8')
-    
+
     print(f"\n[OK] Generated {len(df)} training samples")
     print(f"[OK] Saved to {output_file}")
-    
+
     # Print statistics
     print("\nDataset Statistics:")
     print(f"  Story Points: {df['Custom field (Story Points)'].min():.1f} - {df['Custom field (Story Points)'].max():.1f} (avg: {df['Custom field (Story Points)'].mean():.1f})")
     print(f"  Duration (days): {df['Duracion_Sprint'].min():.1f} - {df['Duracion_Sprint'].max():.1f} (avg: {df['Duracion_Sprint'].mean():.1f})")
     print(f"  Cost: ${df['Costo_por_dia'].min():.0f} - ${df['Costo_por_dia'].max():.0f} (avg: ${df['Costo_por_dia'].mean():.0f})")
     print(f"  Effort: {df['Esfuerzo_por_Puntos_Historia'].min():.1f} - {df['Esfuerzo_por_Puntos_Historia'].max():.1f} hours (avg: {df['Esfuerzo_por_Puntos_Historia'].mean():.1f})")
-    
+
     print("\nSample stories:")
     print(df[['Titulo', 'Custom field (Story Points)']].head(10))
 

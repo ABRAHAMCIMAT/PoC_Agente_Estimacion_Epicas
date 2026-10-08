@@ -1,0 +1,55 @@
+# SonarQube Community Edition + scanner, 100% local (sin cuenta externa, sin costo).
+# No se levanta junto al resto de la app: es una herramienta de análisis aparte.
+#
+# Uso:
+#   docker compose -f docker-compose.sonar.yml up -d sonarqube
+#   -> abrir http://localhost:9000 (usuario/clave inicial: admin/admin)
+#
+#   ./scripts/sonar-scan.sh   (ver ese script; corre el "scanner" con el token que generes en la UI)
+#
+# Detener:
+#   docker compose -f docker-compose.sonar.yml down
+
+services:
+  sonarqube:
+    image: sonarqube:lts-community
+    container_name: poc-epicas-sonarqube
+    ports:
+      - "9000:9000"
+    environment:
+      # Evita el chequeo de vm.max_map_count del host; aceptable para uso local.
+      - SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_logs:/opt/sonarqube/logs
+    ulimits:
+      nofile:
+        soft: 131072
+        hard: 131072
+      nproc:
+        soft: 8192
+        hard: 8192
+    networks:
+      - sonar-net
+
+  scanner:
+    image: sonarsource/sonar-scanner-cli:latest
+    depends_on:
+      - sonarqube
+    volumes:
+      - .:/usr/src
+    working_dir: /usr/src
+    networks:
+      - sonar-net
+    profiles:
+      - scan # no se levanta con "up -d"; se invoca explícitamente con "run"
+
+networks:
+  sonar-net:
+    driver: bridge
+
+volumes:
+  sonarqube_data:
+  sonarqube_extensions:
+  sonarqube_logs:

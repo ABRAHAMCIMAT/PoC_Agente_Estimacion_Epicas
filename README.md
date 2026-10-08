@@ -1,5 +1,8 @@
 # Sistema de Estimación de Épicas con ML
 
+![CI](https://github.com/ABRAHAMCIMAT/PoC_Agente_Estimacion_Epicas/actions/workflows/ci.yml/badge.svg)
+![CodeQL](https://github.com/ABRAHAMCIMAT/PoC_Agente_Estimacion_Epicas/actions/workflows/codeql.yml/badge.svg)
+
 Sistema fullstack basado en Machine Learning para estimar automáticamente puntos de historia, duración, costo y esfuerzo de épicas/historias de usuario en proyectos Agile.
 
 ## 🎯 Características Principales
@@ -128,6 +131,7 @@ El frontend estará disponible en `http://localhost:3000`
 - **[API_DOCUMENTATION.md](docs/API_DOCUMENTATION.md)**: Documentación de todos los endpoints REST
 - **[CODIGO.md](docs/CODIGO.md)**: Documentación del código fuente
 - **[MEJORES_PRACTICAS.md](docs/MEJORES_PRACTICAS.md)**: Guía de desarrollo y buenas prácticas
+- **[CALIDAD_CODIGO.md](docs/CALIDAD_CODIGO.md)**: Dependabot, CodeQL, CI (lint/tests/coverage) y SonarQube local — cómo leer las métricas de madurez
 
 ## 🔧 Uso Básico
 

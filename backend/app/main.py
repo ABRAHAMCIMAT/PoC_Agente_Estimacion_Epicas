@@ -7,25 +7,25 @@ Provides REST endpoints for:
 - Model statistics
 """
 
-from fastapi import FastAPI, UploadFile, File, HTTPException, BackgroundTasks
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-from typing import List, Dict, Optional
-import numpy as np
-import pandas as pd
-import asyncio
 import os
-from pathlib import Path
-import tempfile
-import traceback
 
 # Import our custom modules
 import sys
+import tempfile
+import traceback
+from pathlib import Path
+from typing import Dict, List, Optional
+
+import numpy as np
+import pandas as pd
+from fastapi import BackgroundTasks, FastAPI, File, HTTPException, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from models.epic_estimation_models import EstimationModels, create_and_train_models
+from models.epic_estimation_models import EstimationModels
 from utils.data_preprocessing import JiraDataPreprocessor, process_user_excel
-
 
 # ============================================================================
 # Request/Response Models
@@ -104,9 +104,9 @@ MODEL_FILE = MODEL_DIR / "models.pkl"
 async def startup_event():
     """Initialize models on startup."""
     global estimation_models
-    
+
     print("Starting up Epic Estimation API...")
-    
+
     # Try to load existing models
     if MODEL_FILE.exists():
         try:
@@ -152,27 +152,27 @@ async def train_models(
 ):
     """
     Train models from CSV file.
-    
+
     Required CSV columns at minimum:
     - Custom field (Story Points) [target variable]
     - Duracion_Sprint, Costo_por_dia, Esfuerzo_por_Puntos_Historia [optional]
     """
     global estimation_models, training_in_progress
-    
+
     if training_in_progress:
         raise HTTPException(
             status_code=429,
             detail="Training already in progress"
         )
-    
+
     if not file.filename.endswith('.csv'):
         raise HTTPException(
             status_code=400,
             detail="File must be CSV format"
         )
-    
+
     training_in_progress = True
-    
+
     try:
         # Save uploaded file temporarily
         with tempfile.NamedTemporaryFile(
@@ -183,17 +183,17 @@ async def train_models(
             content = await file.read()
             tmp_file.write(content)
             tmp_path = tmp_file.name
-        
+
         try:
             # Train models
             print(f"Training models from {file.filename}...")
-            
+
             # Read CSV and prepare data
             df = pd.read_csv(tmp_path, encoding='utf-8')
             df.columns = df.columns.str.strip()
-            
+
             print(f"[INFO] Loaded {len(df)} rows with columns: {df.columns.tolist()}")
-            
+
             # Required columns: target plus the text columns feature
             # extraction is based on
             required_col = 'Custom field (Story Points)'
@@ -255,25 +255,25 @@ async def train_models(
                 'cost': y_cost,
                 'effort': y_effort
             }
-            
+
             # Create and train models
             estimation_models = EstimationModels(str(MODEL_DIR))
             estimation_models.train(X, y_dict)
             estimation_models.save(str(MODEL_FILE))
-            
-            print(f"[OK] Models trained successfully")
-            
+
+            print("[OK] Models trained successfully")
+
             return {
                 "status": "success",
                 "message": f"Models trained on {len(df)} samples",
                 "models": list(estimation_models.rf_models.keys()),
                 "model_file": str(MODEL_FILE)
             }
-        
+
         finally:
             # Clean up temp file
             os.unlink(tmp_path)
-    
+
     except Exception as e:
         print(f"Error during training: {e}")
         traceback.print_exc()
@@ -281,7 +281,7 @@ async def train_models(
             status_code=500,
             detail=f"Training failed: {str(e)}"
         )
-    
+
     finally:
         training_in_progress = False
 
@@ -298,27 +298,27 @@ async def estimate_single_story(request: StoryEstimationRequest):
             status_code=503,
             detail="Models not trained. Call POST /train first."
         )
-    
+
     try:
         # Create feature vector from story
         # This is a simplified version; in production, you'd encode all features
         features = create_feature_vector(request)
-        
+
         # Make predictions
         point_pred = estimation_models.predict(features, 'point')
         time_pred = estimation_models.predict(features, 'time')
         cost_pred = estimation_models.predict(features, 'cost')
         effort_pred = estimation_models.predict(features, 'effort')
-        
+
         # Try semantic estimation if corpus available
         semantic = None
         if estimation_models.embeddings is not None:
             try:
                 text = f"{request.title}\n{request.description}"
                 semantic = estimation_models.estimate_by_similarity(text)
-            except:
+            except Exception:
                 pass
-        
+
         # Get model confidence metrics (R² scores)
         model_confidence = None
         if hasattr(estimation_models, 'model_metrics') and estimation_models.model_metrics:
@@ -328,7 +328,7 @@ async def estimate_single_story(request: StoryEstimationRequest):
                 'cost': estimation_models.model_metrics.get('cost', {}),
                 'effort': estimation_models.model_metrics.get('effort', {})
             }
-        
+
         # Format response
         return EstimationResponse(
             story_title=request.title,
@@ -355,7 +355,7 @@ async def estimate_single_story(request: StoryEstimationRequest):
             semantic_estimate=semantic,
             model_confidence=model_confidence
         )
-    
+
     except Exception as e:
         print(f"Error in estimation: {e}")
         traceback.print_exc()
@@ -373,10 +373,10 @@ async def estimate_batch(request: BatchEstimationRequest):
             status_code=503,
             detail="Models not trained. Call POST /train first."
         )
-    
+
     results = []
     errors = []
-    
+
     for story in request.stories:
         try:
             result = await estimate_single_story(story)
@@ -386,7 +386,7 @@ async def estimate_batch(request: BatchEstimationRequest):
                 "story": story.title,
                 "error": str(e)
             })
-    
+
     return {
         "total": len(request.stories),
         "successful": len(results),
@@ -400,7 +400,7 @@ async def estimate_batch(request: BatchEstimationRequest):
 async def estimate_from_excel(file: UploadFile = File(...)):
     """
     Upload Excel file with stories and get estimations.
-    
+
     Expected columns: Titulo, Historia de Usuario, Criterios de Aceptación
     """
     if not estimation_models or not estimation_models.rf_models:
@@ -408,13 +408,13 @@ async def estimate_from_excel(file: UploadFile = File(...)):
             status_code=503,
             detail="Models not trained. Call POST /train first."
         )
-    
+
     if not file.filename.endswith(('.xlsx', '.xls')):
         raise HTTPException(
             status_code=400,
             detail="File must be Excel format (.xlsx or .xls)"
         )
-    
+
     try:
         # Save uploaded file temporarily
         with tempfile.NamedTemporaryFile(
@@ -425,11 +425,11 @@ async def estimate_from_excel(file: UploadFile = File(...)):
             content = await file.read()
             tmp_file.write(content)
             tmp_path = tmp_file.name
-        
+
         try:
             # Read Excel
             df = process_user_excel(tmp_path)
-            
+
             # Convert to estimation requests
             requests = []
             for _, row in df.iterrows():
@@ -440,25 +440,25 @@ async def estimate_from_excel(file: UploadFile = File(...)):
                         criteria_list = [c.strip() for c in criteria.split('\n') if c.strip()]
                     elif isinstance(criteria, list):
                         criteria_list = criteria
-                
+
                 requests.append(StoryEstimationRequest(
                     title=str(row.get('Titulo', 'Unknown')),
                     description=str(row.get('Historia de Usuario', '')),
                     acceptance_criteria=criteria_list if criteria_list else None
                 ))
-            
+
             # Get estimations
             batch_request = BatchEstimationRequest(stories=requests)
             result = await estimate_batch(batch_request)
-            
+
             # Add Excel export capability
             result['export_url'] = '/estimate/excel/results'
-            
+
             return result
-        
+
         finally:
             os.unlink(tmp_path)
-    
+
     except Exception as e:
         print(f"Error processing Excel: {e}")
         traceback.print_exc()
@@ -495,51 +495,50 @@ def create_feature_vector(request: StoryEstimationRequest) -> np.ndarray:
     Extracts features from title, description, and criteria.
     """
     import re
-    from collections import Counter
-    
+
     # Initialize 10-feature vector
     features = np.zeros((1, 10), dtype=np.float32)
-    
+
     title = request.title or ''
     description = request.description or ''
     criteria = ' '.join(request.acceptance_criteria or [])
     full_text = f"{title} {description} {criteria}".lower()
-    
+
     # Feature 0: Story complexity from title keywords
-    complexity_keywords = ['complex', 'difícil', 'difícil', 'integración', 'integration', 
+    complexity_keywords = ['complex', 'difícil', 'difícil', 'integración', 'integration',
                           'refactor', 'refactorización', 'arquitectura', 'architecture',
                           'seguridad', 'security', 'performance', 'database', 'api']
     complexity_score = sum(1 for kw in complexity_keywords if kw in full_text)
     features[0, 0] = min(complexity_score / 5.0, 1.0)
-    
+
     # Feature 1: Story scope (text length normalized)
     text_length = len(description)
     features[0, 1] = min(text_length / 500.0, 1.0)
-    
+
     # Feature 2: Number of acceptance criteria (indicates scope)
     criteria_count = len(request.acceptance_criteria or [])
     features[0, 2] = min(criteria_count / 5.0, 1.0)
-    
+
     # Feature 3: Technical keywords (UI vs Backend vs Integration)
     tech_keywords = ['api', 'base de datos', 'database', 'backend', 'servidor',
                     'ui', 'frontend', 'interfaz', 'pantalla', 'screen', 'form',
                     'autenticación', 'authentication', 'cache', 'performance']
     tech_score = sum(1 for kw in tech_keywords if kw in full_text)
     features[0, 3] = min(tech_score / 4.0, 1.0)
-    
+
     # Feature 4: Data/Integration keywords
     data_keywords = ['integración', 'integration', 'migración', 'migration', 'export',
                     'import', 'sync', 'sincronización', 'datos', 'data', 'csv', 'excel',
                     'api', 'rest', 'soap', 'webhook']
     data_score = sum(1 for kw in data_keywords if kw in full_text)
     features[0, 4] = min(data_score / 3.0, 1.0)
-    
+
     # Feature 5: Testing requirements
     testing_keywords = ['test', 'prueba', 'unitario', 'unit', 'integration',
                        'validar', 'validación', 'verificar', 'qa']
     testing_score = sum(1 for kw in testing_keywords if kw in full_text)
     features[0, 5] = min(testing_score / 3.0, 1.0)
-    
+
     # Feature 6: Priority encoding (from title hints)
     priority_keywords = {
         'urgent': 1.0, 'crítico': 1.0, 'critical': 1.0,
@@ -553,7 +552,7 @@ def create_feature_vector(request: StoryEstimationRequest) -> np.ndarray:
             priority_score = score
             break
     features[0, 6] = priority_score
-    
+
     # Feature 7: Issue type hints
     type_keywords = {
         'feature': 0.8, 'característica': 0.8, 'nueva': 0.8,
@@ -566,11 +565,11 @@ def create_feature_vector(request: StoryEstimationRequest) -> np.ndarray:
             type_score = score
             break
     features[0, 7] = type_score
-    
+
     # Feature 8: Number words (estimation hints)
     numbers = re.findall(r'\d+', description)
     features[0, 8] = min(len(numbers) / 3.0, 1.0)
-    
+
     # Feature 9: Unique word variety (simpler = more straightforward)
     words = description.split()
     if words:
@@ -578,7 +577,7 @@ def create_feature_vector(request: StoryEstimationRequest) -> np.ndarray:
         features[0, 9] = unique_ratio
     else:
         features[0, 9] = 0.5
-    
+
     return features
 
 
