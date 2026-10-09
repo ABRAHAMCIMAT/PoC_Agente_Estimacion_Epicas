@@ -1,0 +1,78 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+ENV/
+env/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+.next/
+out/
+dist/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Model artifacts (except examples)
+backend/trained_models/
+*.pkl
+*.joblib
+
+# Temporary files
+*.tmp
+tmp/
+temp/
+
+# start.sh runtime state (logs, chosen ports)
+.run/
+
+# Test coverage
+htmlcov/
+.coverage
+.pytest_cache/
+backend/coverage.xml
+frontend/coverage/
+
+# SonarQube local
+.scannerwork/
+.env.sonar
+
+# Package lock files (optional, uncomment if working in team)
+# package-lock.json
+# yarn.lock

@@ -1,0 +1,56 @@
+name: CodeQL
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Lunes 06:00 UTC, independiente de la actividad de PRs.
+    - cron: "0 6 * * 1"
+
+permissions:
+  actions: read
+  contents: read
+  # security-events: write no es necesario: no subimos a la pestaña Security
+  # (requeriría GitHub Advanced Security, de pago en repos privados).
+
+jobs:
+  analyze:
+    name: Analizar (${{ matrix.language }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ["javascript-typescript", "python"]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Inicializar CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+
+      - name: Analizar
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{ matrix.language }}"
+          # Subir alertas a la pestaña Security requiere GitHub Advanced
+          # Security, de pago en repos privados. Como este repo es privado,
+          # generamos el SARIF pero no lo publicamos ahí: queda como
+          # artifact descargable (ver resultados abriéndolo con la
+          # extensión "SARIF Viewer" de VS Code, por ejemplo).
+          upload: false
+          output: sarif-results
+
+      - name: Subir resultado SARIF como artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: codeql-${{ matrix.language }}
+          path: sarif-results
+          retention-days: 30

@@ -1,0 +1,129 @@
+{
+  "total": 5,
+  "successful": 5,
+  "failed": 0,
+  "results": [
+    {
+      "story_title": "Crear pantalla de login",
+      "point_estimate": {
+        "ensemble": 6.807729182650432,
+        "random_forest": 8.97453630612311,
+        "decision_tree": 4.640922059177754
+      },
+      "time_estimate": {
+        "ensemble": 9.06163651222857,
+        "random_forest": 8.632720211914831,
+        "decision_tree": 9.490552812542308
+      },
+      "cost_estimate": {
+        "ensemble": 3394.1905932954514,
+        "random_forest": 3056.989141491981,
+        "decision_tree": 3731.3920450989212
+      },
+      "effort_estimate": {
+        "ensemble": 84.27937829159457,
+        "random_forest": 101.5758302036857,
+        "decision_tree": 66.98292637950344
+      },
+      "semantic_estimate": null
+    },
+    {
+      "story_title": "Implementar carrito de compras",
+      "point_estimate": {
+        "ensemble": 6.807729182650433,
+        "random_forest": 8.974536306123111,
+        "decision_tree": 4.640922059177754
+      },
+      "time_estimate": {
+        "ensemble": 9.061636512228569,
+        "random_forest": 8.63272021191483,
+        "decision_tree": 9.490552812542308
+      },
+      "cost_estimate": {
+        "ensemble": 3394.1905932954514,
+        "random_forest": 3056.989141491982,
+        "decision_tree": 3731.3920450989212
+      },
+      "effort_estimate": {
+        "ensemble": 84.27937829159458,
+        "random_forest": 101.57583020368573,
+        "decision_tree": 66.98292637950344
+      },
+      "semantic_estimate": null
+    },
+    {
+      "story_title": "Generar reporte de ventas",
+      "point_estimate": {
+        "ensemble": 6.807729182650432,
+        "random_forest": 8.97453630612311,
+        "decision_tree": 4.640922059177754
+      },
+      "time_estimate": {
+        "ensemble": 9.06163651222857,
+        "random_forest": 8.632720211914831,
+        "decision_tree": 9.490552812542308
+      },
+      "cost_estimate": {
+        "ensemble": 3394.1905932954505,
+        "random_forest": 3056.9891414919803,
+        "decision_tree": 3731.3920450989212
+      },
+      "effort_estimate": {
+        "ensemble": 84.27937829159458,
+        "random_forest": 101.57583020368571,
+        "decision_tree": 66.98292637950344
+      },
+      "semantic_estimate": null
+    },
+    {
+      "story_title": "Enviar notificaciones por email",
+      "point_estimate": {
+        "ensemble": 6.807729182650432,
+        "random_forest": 8.97453630612311,
+        "decision_tree": 4.640922059177754
+      },
+      "time_estimate": {
+        "ensemble": 9.061636512228569,
+        "random_forest": 8.63272021191483,
+        "decision_tree": 9.490552812542308
+      },
+      "cost_estimate": {
+        "ensemble": 3394.1905932954514,
+        "random_forest": 3056.9891414919816,
+        "decision_tree": 3731.3920450989212
+      },
+      "effort_estimate": {
+        "ensemble": 84.27937829159458,
+        "random_forest": 101.57583020368571,
+        "decision_tree": 66.98292637950344
+      },
+      "semantic_estimate": null
+    },
+    {
+      "story_title": "Integrar API de pagos",
+      "point_estimate": {
+        "ensemble": 6.807729182650432,
+        "random_forest": 8.97453630612311,
+        "decision_tree": 4.640922059177754
+      },
+      "time_estimate": {
+        "ensemble": 9.061636512228567,
+        "random_forest": 8.632720211914828,
+        "decision_tree": 9.490552812542308
+      },
+      "cost_estimate": {
+        "ensemble": 3394.1905932954514,
+        "random_forest": 3056.9891414919816,
+        "decision_tree": 3731.3920450989212
+      },
+      "effort_estimate": {
+        "ensemble": 84.27937829159458,
+        "random_forest": 101.57583020368573,
+        "decision_tree": 66.98292637950344
+      },
+      "semantic_estimate": null
+    }
+  ],
+  "errors": null,
+  "export_url": "/estimate/excel/results"
+}

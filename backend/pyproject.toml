@@ -1,0 +1,19 @@
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+exclude = ["venv", "trained_models", "__pycache__"]
+
+[tool.ruff.lint]
+# E/F = pyflakes+pycodestyle básicos, W = warnings, I = import order.
+select = ["E", "F", "W", "I"]
+ignore = [
+    "E501", # línea larga: el repo tiene varias cadenas/docstrings extensas
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.coverage.run]
+source = ["app", "models", "utils"]
+omit = ["tests/*", "venv/*"]
