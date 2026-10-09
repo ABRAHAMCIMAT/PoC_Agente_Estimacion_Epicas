@@ -28,8 +28,19 @@ Workflow: [`.github/workflows/codeql.yml`](../.github/workflows/codeql.yml).
 - Corre en cada push/PR a `main` y además una vez por semana (lunes 06:00 UTC).
 - Analiza JavaScript/TypeScript (frontend) y Python (backend) buscando
   vulnerabilidades conocidas (inyección, uso de funciones inseguras, etc.).
-- Resultados en la pestaña **Security > Code scanning alerts** del repo.
-- Gratis para todos los repos en GitHub (público o privado).
+
+> **Nota sobre repos privados:** publicar las alertas en la pestaña
+> **Security > Code scanning** requiere *GitHub Advanced Security*, que en
+> repos privados es de pago (en repos públicos es gratis) — la misma
+> restricción que aplica a SonarCloud. Como este repo se mantiene privado,
+> el workflow corre el análisis igual (sirve como gate de calidad en cada
+> PR) pero publica el resultado como **artifact descargable** (`codeql-python`,
+> `codeql-javascript-typescript` en la pestaña *Actions* de cada ejecución)
+> en vez de subirlo a Security. Para revisarlo: descargar el artifact y
+> abrir el `.sarif` con la extensión *SARIF Viewer* de VS Code, o con
+> `gh run download`. Si en algún momento el repo se hace público, basta
+> quitar `upload: false` de `codeql.yml` para que vuelva a integrarse con
+> la pestaña Security.
 
 ## 3. Pipeline de CI — lint + tests + coverage
 
