@@ -16,6 +16,10 @@ updates:
         update-types:
           - "minor"
           - "patch"
+    ignore:
+      - dependency-name: "numpy"
+        versions:
+          - ">=2"
     commit-message:
       prefix: "deps(backend)"
 
