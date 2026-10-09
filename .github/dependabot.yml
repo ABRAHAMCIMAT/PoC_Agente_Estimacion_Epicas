@@ -27,13 +27,17 @@ updates:
       day: "monday"
     open-pull-requests-limit: 10
     labels:
-      - "dependencies"
+      - "dependendencies"
       - "frontend"
     groups:
       npm-minor-patch:
         update-types:
           - "minor"
           - "patch"
+    ignore:
+      - dependency-name: "eslint"
+        versions:
+          - ">=9"
     commit-message:
       prefix: "deps(frontend)"
 
@@ -44,7 +48,7 @@ updates:
       interval: "weekly"
       day: "monday"
     labels:
-      - "dependencies"
+      - "dependendencies"
       - "ci"
     commit-message:
       prefix: "deps(actions)"
