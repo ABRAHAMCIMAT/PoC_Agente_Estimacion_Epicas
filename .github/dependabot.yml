@@ -42,6 +42,9 @@ updates:
       - dependency-name: "eslint"
         versions:
           - ">=9"
+      - dependency-name: "eslint-config-next"
+        versions:
+          - ">=15"
     commit-message:
       prefix: "deps(frontend)"
 
