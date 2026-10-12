@@ -51,6 +51,12 @@ updates:
       - dependency-name: "@types/react"
         versions:
           - ">=19"
+      - dependency-name: "react-dom"
+        versions:
+          - ">=19"
+      - dependency-name: "@types/react-dom"
+        versions:
+          - ">=19"
     commit-message:
       prefix: "deps(frontend)"
 
