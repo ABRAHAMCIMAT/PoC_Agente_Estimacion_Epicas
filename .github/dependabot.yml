@@ -45,6 +45,12 @@ updates:
       - dependency-name: "eslint-config-next"
         versions:
           - ">=15"
+      - dependency-name: "react"
+        versions:
+          - ">=19"
+      - dependency-name: "@types/react"
+        versions:
+          - ">=19"
     commit-message:
       prefix: "deps(frontend)"
 
