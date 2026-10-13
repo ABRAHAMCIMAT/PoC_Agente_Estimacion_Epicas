@@ -36,7 +36,7 @@ jobs:
         run: pytest --cov=app --cov=models --cov=utils --cov-report=xml --cov-report=term-missing
 
       - name: Subir reporte de coverage
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: backend-coverage
           path: backend/coverage.xml
@@ -67,7 +67,7 @@ jobs:
         run: npm run test:coverage
 
       - name: Subir reporte de coverage
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: frontend-coverage
           path: frontend/coverage
